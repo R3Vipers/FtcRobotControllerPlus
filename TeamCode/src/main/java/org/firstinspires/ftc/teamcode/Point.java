@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.opencv.core.Mat;
+
 public class Point {
     public double x;
     public double y;
@@ -29,5 +31,9 @@ public class Point {
         this.y = y;
         this.first_derivative = first_derivative;
         this.second_derivative = second_derivative;
+    }
+
+    public double dist_to_point (double currentX, double currentY) {
+        return Math.sqrt(Math.pow(this.x - currentX, 2) + Math.pow(this.y - currentY, 2));
     }
 }

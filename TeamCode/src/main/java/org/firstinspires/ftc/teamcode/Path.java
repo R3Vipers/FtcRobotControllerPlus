@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Path {
     private final ArrayList<Point> controlPoints = new ArrayList<>();
+    public Path(int numPoints, double x, double y) {
+        this.numPoints = numPoints;
+        this.addControlPoint(x,y);
+    }
     private int numPoints;
     public void addControlPoint(double x, double y) {
         controlPoints.add(new Point(x, y));
-    }
-
-    public void setNumPoints(int numPoints) {
-        this.numPoints = numPoints;
     }
 
     private Point calculatePointOnSpline(double t, Point p0, Point p1, Point p2, Point p3) {
