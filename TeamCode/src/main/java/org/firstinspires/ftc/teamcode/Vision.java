@@ -31,11 +31,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -63,7 +66,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Concept: Double Vision", group = "Concept")
+@TeleOp(name = "Vision")
 @Config
 public class Vision extends OpMode {
 
@@ -87,7 +90,7 @@ public class Vision extends OpMode {
     private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
     private BNO055IMU imu = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private static final int DESIRED_TAG_ID = 10;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
     /**
@@ -114,6 +117,8 @@ public class Vision extends OpMode {
 
     @Override
     public void init() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         initDoubleVision();
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "motor3");
@@ -122,8 +127,8 @@ public class Vision extends OpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -224,9 +229,9 @@ public class Vision extends OpMode {
         if (targetFound) {
             telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
             telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-            telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-            telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-            telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+            telemetry.addData("x",  "%5.1f", desiredTag.ftcPose.x);
+            telemetry.addData("y","%3.0f", desiredTag.ftcPose.y);
+            telemetry.addData("yaw","%3.0f", desiredTag.ftcPose.yaw);
         } else {
             telemetry.addData("\n>","Drive using joysticks to find valid target\n");
         }
@@ -267,10 +272,10 @@ public class Vision extends OpMode {
 
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
+        double leftFrontPower    =  -x +y +yaw;
+        double rightFrontPower   =  -x -y -yaw;
+        double leftBackPower     =  -x -y +yaw;
+        double rightBackPower    =  -x +y -yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -315,7 +320,7 @@ public class Vision extends OpMode {
 
         if (USE_WEBCAM) {
             myVisionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
                     .addProcessors(tfod, aprilTag)
                     .build();
         } else {
