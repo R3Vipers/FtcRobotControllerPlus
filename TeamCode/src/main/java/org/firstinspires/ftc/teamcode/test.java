@@ -34,6 +34,13 @@ public class test extends OpMode
     List<LynxModule> allHubs;
     double [] current_pos;
 
+    double yPower;
+    double xPower;
+    double turnPower;
+    double angle_to_point;
+
+    double movePower = 0.5;
+
     // The IMU sensor object
     BHI260IMU imu;
     @Override
@@ -119,26 +126,37 @@ public class test extends OpMode
         telemetry.addData("x","%.2f", current_pos[1]);
         telemetry.addData("heading","%.2f", current_pos[2]);
         telemetry.addData("loop speed", "%f", (1/runtime.seconds()));
-        // pseudo code for possible path following
 
-//        for (int i = 0; i< path_to_follow.size()-1; i++) {
-//            Point temp = path_to_follow.get(i);
-//            while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.1) {
-//                double yPower = (temp.y - current_pos[0]) * 0.15;
-//                double xPower = (temp.x - current_pos[1]) * 0.15;
-//                double turnPower = (0 - current_pos[0]) * 0.003;
-//
-//                //Normalize wheel powers to be less than 1.0
-//                double max = Math.max(Math.abs(yPower), Math.abs(xPower));
-//                max = Math.max(max, Math.abs(turnPower));
-//
-//                if (max > 1.0) {
-//                    yPower /= max;
-//                    xPower /= max;
-//                    turnPower /= max;
-//                }
-//                moveRobot(xPower, yPower, turnPower, -Math.toRadians(current_pos[2]));
+        // pseudo code for possible path following
+//        int len = path_to_follow.size(); // get the number of points in the path
+//        for (int i = 1; i < len-1; i++) { // loop through each point on the path except the first an last one. mot the first because we are already there and not the last because we want to use PID.
+//            Point temp = path_to_follow.get(i); // get the next pint on the path
+//            while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.4) { //continue moving toward the point until we are within 0.4 inches.
+//                angle_to_point = Math.atan2(temp.y - current_pos[0], temp.x - current_pos[1]); // use the arctangent of the x an y distance to the desired point to find the angle to point
+//                yPower = Math.sin(angle_to_point); //use sin to determine the forward power
+//                xPower = Math.cos(angle_to_point); // use cos to determine the strafe power
+//                turnPower = (-current_pos[2])*0.003; // multiply the negative current angle by 0.003 to find the turning power
+//                if(turnPower >1){turnPower = 1.0 *(turnPower/Math.abs(turnPower));} // makes sure the turning power does not exceed 1
+//                moveRobot(xPower, yPower, turnPower, Math.toRadians(current_pos[2])); // use the move function to change motor powers
 //            }
+//        }
+//
+//        //use proportional control to move to last point
+//        Point temp = path_to_follow.get(path_to_follow.size()-1);
+//        while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.1) {
+//            yPower = (temp.y - current_pos[0]) * 0.15;
+//            xPower = (temp.x - current_pos[1]) * 0.15;
+//            turnPower = (0 - current_pos[2]) * 0.003;
+//
+//            double max = Math.max(Math.abs(yPower), Math.abs(xPower));
+//            max = Math.max(max, Math.abs(turnPower));
+//
+//            if (max > 1.0) {
+//                yPower /= max;
+//                xPower /= max;
+//                turnPower /= max;
+//            }
+//            moveRobot(xPower, yPower, turnPower, -Math.toRadians(current_pos[2]));
 //        }
 
         moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2]));
