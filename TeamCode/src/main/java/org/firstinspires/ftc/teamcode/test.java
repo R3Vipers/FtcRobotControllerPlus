@@ -5,15 +5,14 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,31 +32,26 @@ public class test extends OpMode
     ArrayList<Point> path_to_follow;
     List<LynxModule> allHubs;
     double [] current_pos;
-
     double yPower;
     double xPower;
     double turnPower;
     double angle_to_point;
 
-    double movePower = 0.5;
-
     // The IMU sensor object
     BHI260IMU imu;
+    IMU.Parameters myIMUparameters;
     @Override
     public void init() {
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-//        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample OpMode
-//        parameters.loggingEnabled      = true;
-//        parameters.loggingTag          = "IMU";
-//        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-//
-//        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-//        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-//        // and named "imu".
-//        imu = hardwareMap.get(BHI260IMU.class, "imu");
-//        imu.initialize();
+
+        imu = hardwareMap.get(BHI260IMU.class, "imu");
+        imu.initialize(
+            myIMUparameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                )
+            )
+        );
 
         allHubs = hardwareMap.getAll(LynxModule.class); // bulk reading hubs for faster loop speeds
 
@@ -84,12 +78,10 @@ public class test extends OpMode
         rightBackDrive.setZeroPowerBehavior(BRAKE);
 
         // odometry object takes motors as parameters
-        odo = new odometry(leftBackDrive, rightBackDrive, rightFrontDrive, 0, 0, 0, telemetry, imu);
-
-        path = new Path(5, 0, 0); // number of points, starting x, starting y;
+        odo = new odometry(leftBackDrive, rightBackDrive, rightFrontDrive, 0, 0, 90, telemetry, imu);
+        //creating new path
+        path = new Path(2, 0, 0); // number of points, starting x, starting y;
         path.addControlPoint(0, 10); // new point x, y
-        path.addControlPoint(10,10);
-        path.addControlPoint(0,0);
         path_to_follow = path.get_Path();
 
         // Tell the driver that initialization is complete.
@@ -122,14 +114,14 @@ public class test extends OpMode
         }
 
         current_pos = odo.getPose();
-        telemetry.addData("y", "%.2f",current_pos[0]);
-        telemetry.addData("x","%.2f", current_pos[1]);
-        telemetry.addData("heading","%.2f", current_pos[2]);
-        telemetry.addData("loop speed", "%f", (1/runtime.seconds()));
+        telemetry.addData("y", "%.2f",current_pos[0]);//output of odometry for x
+        telemetry.addData("x","%.2f", current_pos[1]);//output of odometry for y
+        telemetry.addData("heading","%.2f", current_pos[2]);//output of odometry for heading
+        //telemetry.addData("loop speed", "%f", (1/runtime.seconds()));//output of loop speed
 
         // pseudo code for possible path following
 //        int len = path_to_follow.size(); // get the number of points in the path
-//        for (int i = 1; i < len-1; i++) { // loop through each point on the path except the first an last one. mot the first because we are already there and not the last because we want to use PID.
+//        for (int i = 1; i < len-2; i++) { // loop through each point on the path except the first an last one. mot the first because we are already there and not the last because we want to use PID.
 //            Point temp = path_to_follow.get(i); // get the next pint on the path
 //            while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.4) { //continue moving toward the point until we are within 0.4 inches.
 //                angle_to_point = Math.atan2(temp.y - current_pos[0], temp.x - current_pos[1]); // use the arctangent of the x an y distance to the desired point to find the angle to point
@@ -141,11 +133,12 @@ public class test extends OpMode
 //            }
 //        }
 //
-//        //use proportional control to move to last point
+//        //use proportional control to move to last point instead of angle to point.
 //        Point temp = path_to_follow.get(path_to_follow.size()-1);
 //        while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.1) {
-//            yPower = (temp.y - current_pos[0]) * 0.15;
-//            xPower = (temp.x - current_pos[1]) * 0.15;
+//            angle_to_point = Math.atan2(temp.y - current_pos[0], temp.x - current_pos[1]);
+//            yPower = Math.sin(angle_to_point) * temp.dist_to_point(current_pos[1], current_pos[0]);
+//            xPower = Math.cos(angle_to_point) * temp.dist_to_point(current_pos[1], current_pos[0]);
 //            turnPower = (0 - current_pos[2]) * 0.003;
 //
 //            double max = Math.max(Math.abs(yPower), Math.abs(xPower));
@@ -159,10 +152,10 @@ public class test extends OpMode
 //            moveRobot(xPower, yPower, turnPower, -Math.toRadians(current_pos[2]));
 //        }
 
-        moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2]));
-        odo.update();
-        telemetry.update();
-        runtime.reset();
+        moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
+        odo.update();//call the odometry to update the current position
+        telemetry.update();//update the telemetry to display the most recent values
+        //runtime.reset();//reset the runtime for loop timing
     }
 
     /*
@@ -170,22 +163,24 @@ public class test extends OpMode
      */
     @Override
     public void stop() {
-        for (LynxModule hub : allHubs) {
+        for (LynxModule hub : allHubs) { //clear out the cache from the hubs at the end of the program to stop values from carrying over through programs.
+                                         //do not know if this works perfectly may have to restart the robot to clear values
             hub.clearBulkCache();
         }
     }
 
+    //drive code from freight frenzy
     public void moveRobot(double x, double y, double yaw, double angle) {
 
         /**gets squared values from the driver's stick input**/
-        double r = Math.hypot(-y, -x);
+        double r = Math.hypot(-y, -x);//get the hypotenuse of the x and y inputs (r = sqrt(y^2 + x^2) or C^2 = A^2 + B^2)
         /**finds the desired angle that the driver wants to move the robot**/
-        double robotAngle = Math.atan2(-x, y) - Math.PI / 4;
+        double robotAngle = Math.atan2(-x, y) - Math.PI / 4;// use the arc-tangent function to determine the angle, in radians, that the robot desires to move
         /**sets the movement angle by finding the difference of the robots angle, the input angle and the offset value
          * the offset value is set by the the driver if the imu does not reset after auto*/
-        robotAngle = robotAngle + angle;
+        robotAngle = robotAngle + angle;// add the current robot angle and the desired movement angle to find the final movement angle
 
-        double rightX = yaw;
+        double rightX = yaw;// turn power
 
         double v1 = r * Math.cos(robotAngle) - rightX;
         double v2 = r * Math.sin(robotAngle) - rightX;
