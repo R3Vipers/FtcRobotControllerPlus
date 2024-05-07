@@ -67,6 +67,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Vision")
+@Disabled
 @Config
 public class Vision extends OpMode {
 

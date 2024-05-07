@@ -132,7 +132,7 @@ public class odometry {
     }
 
     public double[] getPose () {
-        double[] pos = {x/ENCODER_COUNTS_PER_INCH, -y/ENCODER_COUNTS_PER_INCH, -(Math.toDegrees(heading)+90)};//return the values corrected for inches and degrees
+        double[] pos = {x/ENCODER_COUNTS_PER_INCH, y/ENCODER_COUNTS_PER_INCH, -(Math.toDegrees(heading)-90)};//return the values corrected for inches and degrees
         return pos;
     }
 }
