@@ -4,6 +4,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @TeleOp(name="test")
 @Config
-@Disabled
+//@Disabled
 public class test extends OpMode
 {
     // Declare OpMode members.
@@ -36,10 +37,24 @@ public class test extends OpMode
     double xPower;
     double turnPower;
     double angle_to_point;
+    int i = 0;
+    PIDController pidX;
+    PIDController pidY;
+    PIDController pidH;
+    Point temp = new Point(0, 24);
+    Point temp1 = new Point(24, 24);
+    Point temp2 = new Point(24, 48);
+    Point temp3 = new Point(0, 0);
+
+    Point currentPoint;
+    boolean wait = false;
+
+    ArrayList<Point> Points = new ArrayList<>();
 
     // The IMU sensor object
     BHI260IMU imu;
     IMU.Parameters myIMUparameters;
+
     @Override
     public void init() {
 
@@ -80,10 +95,19 @@ public class test extends OpMode
         // odometry object takes motors as parameters
         odo = new odometry(leftBackDrive, rightBackDrive, rightFrontDrive, 0, 0, 90, telemetry, imu);
         //creating new path
-        path = new Path(2, 0, 0); // number of points, starting x, starting y;
-        path.addControlPoint(0, 10); // new point x, y
+        path = new Path(10, 0, 0); // number of points, starting x, starting y;
+        path.addControlPoint(0, 24); // new point x, y
+        path.addControlPoint(24, 24); // new point x, y
+        path.addControlPoint(24, 48); // new point x, y
+        path.addControlPoint(0, 0); // new point x, y
         path_to_follow = path.get_Path();
-
+        pidX = new PIDController(0.083, 0.041, 0.016);
+        pidY = new PIDController(0.082, 0.041, 0.0175);
+        pidH = new PIDController(0.05, 0.005, 0);
+        Points.add(temp);
+        Points.add(temp1);
+        Points.add(temp2);
+        Points.add(temp3);
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
@@ -101,8 +125,8 @@ public class test extends OpMode
     @Override
     public void start() {
         runtime.reset();
+        currentPoint = path_to_follow.get(i);
     }
-
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
@@ -114,45 +138,38 @@ public class test extends OpMode
         }
 
         current_pos = odo.getPose();
-        telemetry.addData("y", "%.2f",current_pos[0]);//output of odometry for x
-        telemetry.addData("x","%.2f", current_pos[1]);//output of odometry for y
+        telemetry.addData("x", "%.2f",current_pos[0]);//output of odometry for x
+        telemetry.addData("y","%.2f", current_pos[1]);//output of odometry for y
         telemetry.addData("heading","%.2f", current_pos[2]);//output of odometry for heading
         //telemetry.addData("loop speed", "%f", (1/runtime.seconds()));//output of loop speed
 
-        // pseudo code for possible path following
-//        int len = path_to_follow.size(); // get the number of points in the path
-//        for (int i = 1; i < len-2; i++) { // loop through each point on the path except the first an last one. mot the first because we are already there and not the last because we want to use PID.
-//            Point temp = path_to_follow.get(i); // get the next pint on the path
-//            while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.4) { //continue moving toward the point until we are within 0.4 inches.
-//                angle_to_point = Math.atan2(temp.y - current_pos[0], temp.x - current_pos[1]); // use the arctangent of the x an y distance to the desired point to find the angle to point
-//                yPower = Math.sin(angle_to_point); //use sin to determine the forward power
-//                xPower = Math.cos(angle_to_point); // use cos to determine the strafe power
-//                turnPower = (-current_pos[2])*0.003; // multiply the negative current angle by 0.003 to find the turning power
-//                if(turnPower >1){turnPower = 1.0 *(turnPower/Math.abs(turnPower));} // makes sure the turning power does not exceed 1
-//                moveRobot(xPower, yPower, turnPower, Math.toRadians(current_pos[2])); // use the move function to change motor powers
-//            }
-//        }
-//
-//        //use proportional control to move to last point instead of angle to point.
-//        Point temp = path_to_follow.get(path_to_follow.size()-1);
-//        while(temp.dist_to_point(current_pos[1], current_pos[0]) > 0.1) {
-//            angle_to_point = Math.atan2(temp.y - current_pos[0], temp.x - current_pos[1]);
-//            yPower = Math.sin(angle_to_point) * temp.dist_to_point(current_pos[1], current_pos[0]);
-//            xPower = Math.cos(angle_to_point) * temp.dist_to_point(current_pos[1], current_pos[0]);
-//            turnPower = (0 - current_pos[2]) * 0.003;
-//
-//            double max = Math.max(Math.abs(yPower), Math.abs(xPower));
-//            max = Math.max(max, Math.abs(turnPower));
-//
-//            if (max > 1.0) {
-//                yPower /= max;
-//                xPower /= max;
-//                turnPower /= max;
-//            }
-//            moveRobot(xPower, yPower, turnPower, -Math.toRadians(current_pos[2]));
-//        }
+        if(currentPoint.dist_to_point(current_pos[0], current_pos[1]) < 1 && i < path_to_follow.size()-1) {
+            if(!wait) {
+                wait = true;
+                runtime.reset();
+            } else {
+                //if(runtime.seconds() > 3) {
+                    i = i+1;
+                    currentPoint = path_to_follow.get(i);
+                    wait = false;
+                //}
+            }
+        }
 
-        moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
+        if(i < path_to_follow.size()-1) {
+            angle_to_point = Math.atan2(path_to_follow.get(i).x - current_pos[0], path_to_follow.get(i).y - current_pos[1]);
+            yPower = Math.cos(angle_to_point)/2;
+            xPower = Math.sin(angle_to_point)/2;
+        } else {
+            xPower = pidX.calculate(current_pos[0], currentPoint.x);
+            yPower = pidY.calculate(current_pos[1], currentPoint.y);
+        }
+        turnPower = pidH.calculate(current_pos[2], 0);
+
+
+        moveRobot(xPower, -yPower, turnPower, -Math.toRadians(current_pos[2]));
+
+        //moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
         odo.update();//call the odometry to update the current position
         telemetry.update();//update the telemetry to display the most recent values
         //runtime.reset();//reset the runtime for loop timing
@@ -167,6 +184,7 @@ public class test extends OpMode
                                          //do not know if this works perfectly may have to restart the robot to clear values
             hub.clearBulkCache();
         }
+        telemetry.update();
     }
 
     //drive code from freight frenzy
@@ -192,5 +210,10 @@ public class test extends OpMode
         rightFrontDrive.setPower(v2);
         leftBackDrive.setPower(v3);
         rightBackDrive.setPower(v4);
+    }
+
+    public void wait_sec (int seconds) {
+        runtime.reset();
+        while(runtime.seconds() < seconds) {}
     }
 }

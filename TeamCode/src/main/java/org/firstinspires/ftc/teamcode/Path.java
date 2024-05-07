@@ -61,6 +61,7 @@ public class Path {
                 }
             }
         }
+        Spline.add(controlPoints.get(controlPoints.size() - 1));
         return Spline;
     }
 }
