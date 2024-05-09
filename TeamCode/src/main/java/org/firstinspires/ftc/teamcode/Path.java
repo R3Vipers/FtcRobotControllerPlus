@@ -52,9 +52,6 @@ public class Path {
                     double dy = pNext.y - p.y;
                     double theta1 = Math.atan2(dx, dy);
                     double mag1 = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-                    if(mag1 > maxVelocity) {
-                        maxVelocity = mag1;
-                    }
                     p.setFirst_derivative(new Vector(theta1 ,mag1));
                     double d2x = pNextNext.x - 2 * pNext.x + p.x;
                     double d2y = pNextNext.y - 2 * pNext.y + p.y;

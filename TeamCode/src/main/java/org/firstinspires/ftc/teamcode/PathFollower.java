@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
 
 import java.util.ArrayList;
@@ -12,12 +14,12 @@ public class PathFollower {
     ArrayList<Point> path_to_follow;
     Point currentPoint;
     int i;
-
+    double currentVelocity;
     double yPower;
     double xPower;
     double turnPower;
     double angle_to_point;
-    PIDController pidX = new PIDController(0.083, 0.041, 0.016);
+    PIDController pidX = new PIDController(0.087, 0.041, 0.015);
     PIDController pidY = new PIDController(0.082, 0.041, 0.0175);
     PIDController pidH = new PIDController(0.05, 0.005, 0);
 
@@ -50,9 +52,10 @@ public class PathFollower {
         }
 
         if(i < path_to_follow.size()-1) {
+            currentVelocity = currentPoint.first_derivative.magnitude/path.getMaxVelocity();
             angle_to_point = Math.atan2(path_to_follow.get(i).x - current_pos[0], path_to_follow.get(i).y - current_pos[1]);
-            yPower = Math.cos(angle_to_point)*0.8;
-            xPower = Math.sin(angle_to_point)*0.8;
+            yPower = Math.cos(angle_to_point) * 0.8;
+            xPower = Math.sin(angle_to_point) * 0.8;
             turnPower = pidH.calculate(current_pos[2], holdHeading);
         } else {
             xPower = pidX.calculate(current_pos[0], currentPoint.x);
