@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -27,6 +25,7 @@ public class test extends OpMode
     @Override
     public void init() {
         robot.init();
+        robot.clearCache();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
         //creating new path
         path = new Path(30, 0, 0); // number of points, starting x, starting y;
@@ -58,9 +57,29 @@ public class test extends OpMode
             //clearing the cache form all hubs
             robot.clearCache();
             updateAll();
-            follower.update(current_pos, totalRuntime);
+            if(follower.followForward(current_pos, 0, totalRuntime)) {
+                robot.drivetrain.stop();
+                break;
+            }
+        }
+        while(totalRuntime.seconds() < 30) {
+            //clearing the cache form all hubs
+            robot.clearCache();
+            updateAll();
+            if(waitSeconds(5))
+                break;
+        }
+        while(totalRuntime.seconds() < 30) {
+            //clearing the cache form all hubs
+            robot.clearCache();
+            updateAll();
+            if(follower2.followHoldHeading(current_pos, 90, 0, totalRuntime)) {
+                robot.drivetrain.stop();
+                break;
+            }
         }
         telemetry.addData("status", "Ending Auto Period");
+        telemetry.update();
     }
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -77,8 +96,6 @@ public class test extends OpMode
      */
     @Override
     public void stop() {
-        robot.clearCache();
-        telemetry.update();
     }
 
     public void updateAll (){
@@ -86,17 +103,20 @@ public class test extends OpMode
         current_pos = robot.odo.getPose();
         telemetry.addData("x", "%.2f",current_pos[0]);//output of odometry for x
         telemetry.addData("y","%.2f", current_pos[1]);//output of odometry for y
+        telemetry.addData("heading","%.2f", current_pos[2]);//output of odometry for heading
         telemetry.update();//update the telemetry to display the most recent values
     }
 
-    public void waitSeconds(int seconds) {
+    public boolean waitSeconds(int seconds) {
         if(!wait) {
             wait = true;
             runtime.reset();
         } else {
             if(runtime.seconds() > seconds) {
                 wait = false;
+                return true;
             }
         }
+        return false;
     }
 }
