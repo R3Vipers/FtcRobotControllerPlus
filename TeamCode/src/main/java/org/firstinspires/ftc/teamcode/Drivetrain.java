@@ -39,4 +39,10 @@ public class Drivetrain {
         leftBackDrive.setPower(v3);
         rightBackDrive.setPower(v4);
     }
+    public void stop() {
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+    }
 }
