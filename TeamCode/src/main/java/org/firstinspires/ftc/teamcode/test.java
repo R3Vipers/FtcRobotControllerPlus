@@ -57,7 +57,7 @@ public class test extends OpMode
             //clearing the cache form all hubs
             robot.clearCache();
             updateAll();
-            if(follower.followForward(current_pos, 0, totalRuntime)) {
+            if(follower.followHoldHeading(current_pos, 0,0, totalRuntime)) {
                 robot.drivetrain.stop();
                 break;
             }
@@ -73,12 +73,11 @@ public class test extends OpMode
             //clearing the cache form all hubs
             robot.clearCache();
             updateAll();
-            if(follower2.followHoldHeading(current_pos, 90, 0, totalRuntime)) {
+            if(follower2.followHoldHeading(current_pos, 0, 0, totalRuntime)) {
                 robot.drivetrain.stop();
                 break;
             }
         }
-        telemetry.addData("status", "Ending Auto Period");
         telemetry.update();
     }
     /*
@@ -88,6 +87,7 @@ public class test extends OpMode
     public void loop() {
         //clearing the cache form all huds
         robot.clearCache();
+        telemetry.addData("status", "TeleOp Period");
         robot.drivetrain.moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
         updateAll();
     }
