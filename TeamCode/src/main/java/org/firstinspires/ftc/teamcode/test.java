@@ -57,7 +57,7 @@ public class test extends OpMode
             //clearing the cache form all hubs
             robot.clearCache();
             updateAll();
-            if(follower.followHoldHeading(current_pos, 0,0, totalRuntime)) {
+            if(follower.followForward(current_pos, 0, totalRuntime)) {
                 robot.drivetrain.stop();
                 break;
             }
@@ -73,7 +73,7 @@ public class test extends OpMode
             //clearing the cache form all hubs
             robot.clearCache();
             updateAll();
-            if(follower2.followHoldHeading(current_pos, 0, 0, totalRuntime)) {
+            if(follower2.followHoldHeading(current_pos, 90, 90, totalRuntime)) {
                 robot.drivetrain.stop();
                 break;
             }
