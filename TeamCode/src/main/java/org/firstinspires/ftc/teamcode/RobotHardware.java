@@ -19,6 +19,7 @@ public class RobotHardware {
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
     public odometry odo = null;
+    public motorOdometry motor_odo = null;
     public Drivetrain drivetrain = null;
     List<LynxModule> allHubs;
     BHI260IMU imu;
@@ -70,6 +71,7 @@ public class RobotHardware {
 
         // odometry object takes motors as parameters
         odo = new odometry(leftBackDrive, rightBackDrive, rightFrontDrive, 0, 0, 90, telemetry, imu);
+        motor_odo = new motorOdometry(leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive, 0, 0, 90, telemetry, imu);
         drivetrain = new Drivetrain(rightBackDrive, leftBackDrive, rightFrontDrive, leftFrontDrive);
     }
 
