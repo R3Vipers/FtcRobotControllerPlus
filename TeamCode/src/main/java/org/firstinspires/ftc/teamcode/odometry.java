@@ -33,7 +33,7 @@ public class odometry {
     private int past_left_pos = current_left_pos;
     private int past_right_pos = current_right_pos;
     private int past_strafe_pos = current_strafe_pos;
-    public static double track_width = 10.16;//fill in value with horizontal distance from center of robot to the left encoder
+    public static double track_width = 10.16;//fill in value with horizontal distance from center of the robot's two parallel encoders
     public static double distance_to_strafe_encoder = -4.95;//fill in value with vertical distance from center of robot to the strafe encoder
     private double delta_L;
     private double delta_R;
