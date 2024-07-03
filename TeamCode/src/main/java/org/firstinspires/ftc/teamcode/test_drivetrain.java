@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name="test_drivetrain")
 @Config
@@ -19,6 +20,11 @@ public class test_drivetrain extends OpMode {
         robot.init();
         robot.clearCache();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+        robot.drivetrain.leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drivetrain.leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drivetrain.rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drivetrain.rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.clearCache();
         updateAll();
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -56,6 +62,7 @@ public class test_drivetrain extends OpMode {
      */
     @Override
     public void stop() {
+        robot.clearCache();
     }
 
     public void updateAll() {
