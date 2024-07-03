@@ -19,6 +19,7 @@ public class test_drivetrain extends OpMode {
         robot.init();
         robot.clearCache();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+        updateAll();
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
