@@ -20,10 +20,7 @@ public class test_drivetrain extends OpMode {
         robot.init();
         robot.clearCache();
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
-        robot.drivetrain.leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.drivetrain.leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.drivetrain.rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.drivetrain.rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drivetrain.reset();
         robot.clearCache();
         updateAll();
         // Tell the driver that initialization is complete.
@@ -68,10 +65,10 @@ public class test_drivetrain extends OpMode {
     public void updateAll() {
         robot.motor_odo.update();//call the odometry to update the current position
         current_pos = robot.motor_odo.getPose();
-        telemetry.addData("FL", robot.drivetrain.leftFrontDrive.getCurrentPosition());
+        telemetry.addData("FL", -robot.drivetrain.leftFrontDrive.getCurrentPosition());
         telemetry.addData("FR", robot.drivetrain.rightFrontDrive.getCurrentPosition());
         telemetry.addData("BL", robot.drivetrain.leftBackDrive.getCurrentPosition());
-        telemetry.addData("BR", robot.drivetrain.rightBackDrive.getCurrentPosition());
+        telemetry.addData("BR", -robot.drivetrain.rightBackDrive.getCurrentPosition());
         telemetry.addData("x", "%.2f", current_pos[0]);//output of odometry for x
         telemetry.addData("y", "%.2f", current_pos[1]);//output of odometry for y
         telemetry.addData("heading", "%.2f", current_pos[2]);//output of odometry for heading

@@ -27,10 +27,10 @@ public class motorOdometry {
     private int current_right_front_pos = 0;
     private int current_left_back_pos = 0;
     private int current_right_back_pos = 0;
-    private int past_left_front_pos = current_left_front_pos;
+    private int past_left_front_pos = -current_left_front_pos;
     private int past_right_front_pos = current_right_front_pos;
     private int past_left_back_pos = current_left_back_pos;
-    private int past_right_back_pos = current_right_back_pos;
+    private int past_right_back_pos = -current_right_back_pos;
     public static double track_width = 10;//fill in value with horizontal distance from center of robot's left and right wheels
     private double delta_L_F;
     private double delta_R_F;
@@ -53,10 +53,10 @@ public class motorOdometry {
     }
 
     public void update () {
-        current_left_front_pos = leftFront.getCurrentPosition();
+        current_left_front_pos = -leftFront.getCurrentPosition();
         current_right_front_pos = rightFront.getCurrentPosition();
         current_left_back_pos = leftBack.getCurrentPosition();
-        current_right_back_pos = rightBack.getCurrentPosition();
+        current_right_back_pos = -rightBack.getCurrentPosition();
 
         delta_L_F = current_left_front_pos - past_left_front_pos;
         delta_L_B = current_left_back_pos - past_left_back_pos;
