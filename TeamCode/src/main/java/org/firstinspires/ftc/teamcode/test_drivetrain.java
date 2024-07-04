@@ -13,21 +13,22 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 //@Disabled
 public class test_drivetrain extends OpMode {
-    private Telemetry telemetry;
     // Declare OpMode members.
-    private RobotHardware robot;
+    private RobotHardware robot = new RobotHardware(this);
     double[] current_pos;
-
+    Telemetry telemetry;
+    motorOdometry odo;
     @Override
     public void init() {
-        robot = new RobotHardware(this, telemetry);
         robot.init();
         robot.clearCache();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+        odo = new motorOdometry(robot.drivetrain.leftFrontDrive, robot.drivetrain.rightFrontDrive, robot.drivetrain.leftBackDrive, robot.drivetrain.rightBackDrive, 0, 0, 90, telemetry, robot.imu);
         robot.drivetrain.reset();
         robot.clearCache();
         updateAll();
         // Tell the driver that initialization is complete.
-        robot.telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initialized");
     }
 
     /*
@@ -52,7 +53,7 @@ public class test_drivetrain extends OpMode {
     public void loop() {
         //clearing the cache form all huds
         robot.clearCache();
-        robot.telemetry.addData("status", "TeleOp Period");
+        telemetry.addData("status", "TeleOp Period");
         robot.drivetrain.moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
         updateAll();
     }
@@ -66,15 +67,15 @@ public class test_drivetrain extends OpMode {
     }
 
     public void updateAll() {
-        robot.motor_odo.update();//call the odometry to update the current position
-        current_pos = robot.motor_odo.getPose();
-        robot.telemetry.addData("FL", -robot.drivetrain.leftFrontDrive.getCurrentPosition());
-        robot.telemetry.addData("FR", robot.drivetrain.rightFrontDrive.getCurrentPosition());
-        robot.telemetry.addData("BL", robot.drivetrain.leftBackDrive.getCurrentPosition());
-        robot.telemetry.addData("BR", -robot.drivetrain.rightBackDrive.getCurrentPosition());
-        robot.telemetry.addData("x", "%.2f", current_pos[0]);//output of odometry for x
-        robot.telemetry.addData("y", "%.2f", current_pos[1]);//output of odometry for y
-        robot.telemetry.addData("heading", "%.2f", current_pos[2]);//output of odometry for heading
-        robot.telemetry.update();//update the telemetry to display the most recent values
+        odo.update();//call the odometry to update the current position
+        current_pos = odo.getPose();
+        telemetry.addData("FL", -robot.drivetrain.leftFrontDrive.getCurrentPosition());
+        telemetry.addData("FR", robot.drivetrain.rightFrontDrive.getCurrentPosition());
+        telemetry.addData("BL", robot.drivetrain.leftBackDrive.getCurrentPosition());
+        telemetry.addData("BR", -robot.drivetrain.rightBackDrive.getCurrentPosition());
+        telemetry.addData("x", "%.2f", current_pos[0]);//output of odometry for x
+        telemetry.addData("y", "%.2f", current_pos[1]);//output of odometry for y
+        telemetry.addData("heading", "%.2f", current_pos[2]);//output of odometry for heading
+        telemetry.update();//update the telemetry to display the most recent values
     }
 }
