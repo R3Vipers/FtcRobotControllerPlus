@@ -9,6 +9,10 @@ import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class motorOdometry {
     final private double xMultiplier = 1.0;
@@ -65,7 +69,14 @@ public class motorOdometry {
 
         deltaHeading = (delta_L_F+delta_L_B-delta_R_F-delta_R_B)/(2.0*track_width*ENCODER_COUNTS_PER_INCH);
 
+        telemetry.addData("change in heading",deltaHeading);
+
         heading = normalizeRadians(heading+deltaHeading);
+
+        Orientation angles = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
+        double angle = angles.firstAngle;
+        telemetry.addData("angle", "%f", angle);
+        telemetry.addData("track width", "%f", (current_left_front_pos+current_left_back_pos-current_right_front_pos-current_right_back_pos)/(2.0*angle*ENCODER_COUNTS_PER_INCH));
 
         double turn_ticks = deltaHeading*track_width*ENCODER_COUNTS_PER_INCH*2.0;
 
