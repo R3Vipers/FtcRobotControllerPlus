@@ -27,10 +27,10 @@ public class motorOdometry {
     private DcMotor rightBack;
 
     Telemetry telemetry;
-    private int current_left_front_pos = 0;
-    private int current_right_front_pos = 0;
-    private int current_left_back_pos = 0;
-    private int current_right_back_pos = 0;
+    public int current_left_front_pos = 0;
+    public int current_right_front_pos = 0;
+    public int current_left_back_pos = 0;
+    public int current_right_back_pos = 0;
     private int past_left_front_pos = -current_left_front_pos;
     private int past_right_front_pos = current_right_front_pos;
     private int past_left_back_pos = current_left_back_pos;
@@ -40,8 +40,8 @@ public class motorOdometry {
     private double delta_R_F = 0;
     private double delta_L_B = 0;
     private double delta_R_B = 0;
-    private double deltaHeading = 0;
-    private static double ENCODER_COUNTS_PER_INCH = 537.7/(2*Math.PI*1.88976);
+    public double deltaHeading = 0;
+    public double ENCODER_COUNTS_PER_INCH = 537.7/(2*Math.PI*1.88976);
     private BHI260IMU imu;
 
     public motorOdometry (DcMotor LF, DcMotor RF, DcMotor LB, DcMotor RB, double starting_x, double starting_y, double starting_heading, Telemetry telemetry, BHI260IMU imu) {
@@ -69,14 +69,7 @@ public class motorOdometry {
 
         deltaHeading = (delta_L_F+delta_L_B-delta_R_F-delta_R_B)/(2.0*track_width*ENCODER_COUNTS_PER_INCH);
 
-        telemetry.addData("change in heading", "%f", deltaHeading);
-
         heading = normalizeRadians(heading+deltaHeading);
-
-        Orientation angles = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
-        double angle = angles.firstAngle;
-        telemetry.addData("angle", "%f", angle);
-        telemetry.addData("track width", "%f", (current_left_front_pos+current_left_back_pos-current_right_front_pos-current_right_back_pos)/(2.0*angle*ENCODER_COUNTS_PER_INCH));
 
         double turn_ticks = deltaHeading*track_width*ENCODER_COUNTS_PER_INCH*2.0;
 

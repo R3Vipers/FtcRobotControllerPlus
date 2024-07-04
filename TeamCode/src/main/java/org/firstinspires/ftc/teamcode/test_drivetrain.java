@@ -8,6 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp(name="test_drivetrain")
 @Config
@@ -69,6 +73,11 @@ public class test_drivetrain extends OpMode {
     public void updateAll() {
         odo.update();//call the odometry to update the current position
         current_pos = odo.getPose();
+        telemetry.addData("change in heading", "%f", robot.motor_odo.deltaHeading);
+        Orientation angles = robot.imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
+        double angle = angles.firstAngle;
+        telemetry.addData("angle", "%f", angle);
+        telemetry.addData("track width", "%f", (robot.motor_odo.current_left_front_pos+robot.motor_odo.current_left_back_pos-robot.motor_odo.current_right_front_pos-robot.motor_odo.current_right_back_pos)/(2.0*angle*robot.motor_odo.ENCODER_COUNTS_PER_INCH));
         telemetry.addData("FL", -robot.drivetrain.leftFrontDrive.getCurrentPosition());
         telemetry.addData("FR", robot.drivetrain.rightFrontDrive.getCurrentPosition());
         telemetry.addData("BL", robot.drivetrain.leftBackDrive.getCurrentPosition());
