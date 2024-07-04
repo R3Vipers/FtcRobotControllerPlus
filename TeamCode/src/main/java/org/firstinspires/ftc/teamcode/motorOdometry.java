@@ -36,11 +36,11 @@ public class motorOdometry {
     private int past_left_back_pos = current_left_back_pos;
     private int past_right_back_pos = -current_right_back_pos;
     public static double track_width = 10;//fill in value with horizontal distance from center of robot's left and right wheels
-    private double delta_L_F;
-    private double delta_R_F;
-    private double delta_L_B;
-    private double delta_R_B;
-    private double deltaHeading;
+    private double delta_L_F = 0;
+    private double delta_R_F = 0;
+    private double delta_L_B = 0;
+    private double delta_R_B = 0;
+    private double deltaHeading = 0;
     private static double ENCODER_COUNTS_PER_INCH = 537.7/(2*Math.PI*1.88976);
     private BHI260IMU imu;
 
@@ -69,7 +69,7 @@ public class motorOdometry {
 
         deltaHeading = (delta_L_F+delta_L_B-delta_R_F-delta_R_B)/(2.0*track_width*ENCODER_COUNTS_PER_INCH);
 
-        telemetry.addData("change in heading",deltaHeading);
+        telemetry.addData("change in heading", "%f", deltaHeading);
 
         heading = normalizeRadians(heading+deltaHeading);
 
