@@ -34,8 +34,9 @@ public class RobotHardware {
     Telemetry telemetry;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
-    public RobotHardware (OpMode opmode) {
+    public RobotHardware (OpMode opmode, Telemetry telemetry) {
         myOpMode = opmode;
+        this.telemetry = telemetry;
     }
 
     /**
@@ -45,7 +46,6 @@ public class RobotHardware {
      * All of the hardware devices are accessed via the hardware map, and initialized.
      */
     public void init()    {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
 
         imu = myOpMode.hardwareMap.get(BHI260IMU.class, "imu");
         imu.initialize(

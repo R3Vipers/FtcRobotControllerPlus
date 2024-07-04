@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @TeleOp(name="test")
 @Config
 //@Disabled
@@ -14,7 +16,9 @@ public class test extends OpMode
     // Declare OpMode members.
     private ElapsedTime totalRuntime = new ElapsedTime();
     private ElapsedTime runtime = new ElapsedTime();
-    private RobotHardware robot = new RobotHardware(this);
+    private Telemetry telemetry;
+    // Declare OpMode members.
+    private RobotHardware robot;
     private PathFollower follower = null;
     private PathFollower follower2 = null;
     private Path path = null;
@@ -24,6 +28,8 @@ public class test extends OpMode
 
     @Override
     public void init() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+        robot = new RobotHardware(this, telemetry);
         robot.init();
         robot.clearCache();
         //creating new path
