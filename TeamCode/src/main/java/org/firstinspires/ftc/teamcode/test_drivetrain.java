@@ -20,7 +20,6 @@ public class test_drivetrain extends OpMode {
 
     @Override
     public void init() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
         robot = new RobotHardware(this, telemetry);
         robot.init();
         robot.clearCache();
