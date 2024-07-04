@@ -26,7 +26,6 @@ public class test extends OpMode
     public void init() {
         robot.init();
         robot.clearCache();
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
         //creating new path
         path = new Path(30, 0, 0); // number of points, starting x, starting y;
         path.addControlPoint(0, 24); // new point x, y
@@ -37,7 +36,7 @@ public class test extends OpMode
         follower = new PathFollower(robot.drivetrain, path);
         follower2 = new PathFollower(robot.drivetrain, path2);
         // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        robot.telemetry.addData("Status", "Initialized");
     }
 
     /*
@@ -87,7 +86,7 @@ public class test extends OpMode
     public void loop() {
         //clearing the cache form all huds
         robot.clearCache();
-        telemetry.addData("status", "TeleOp Period");
+        robot.telemetry.addData("status", "TeleOp Period");
         robot.drivetrain.moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, -Math.toRadians(current_pos[2])); //freight frenzy driver code
         updateAll();
     }
@@ -101,10 +100,10 @@ public class test extends OpMode
     public void updateAll (){
         robot.odo.update();//call the odometry to update the current position
         current_pos = robot.odo.getPose();
-        telemetry.addData("x", "%.2f",current_pos[0]);//output of odometry for x
-        telemetry.addData("y","%.2f", current_pos[1]);//output of odometry for y
-        telemetry.addData("heading","%.2f", current_pos[2]);//output of odometry for heading
-        telemetry.update();//update the telemetry to display the most recent values
+        robot.telemetry.addData("x", "%.2f",current_pos[0]);//output of odometry for x
+        robot.telemetry.addData("y","%.2f", current_pos[1]);//output of odometry for y
+        robot.telemetry.addData("heading","%.2f", current_pos[2]);//output of odometry for heading
+        robot.telemetry.update();//update the telemetry to display the most recent values
     }
 
     public boolean waitSeconds(int seconds) {
