@@ -22,7 +22,7 @@ public class test_drivetrain extends OpMode {
     public void init() {
         robot.init();
         robot.clearCache();
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+        //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
         odo = new motorOdometry(robot.drivetrain.leftFrontDrive, robot.drivetrain.rightFrontDrive, robot.drivetrain.leftBackDrive, robot.drivetrain.rightBackDrive, 0, 0, 90, telemetry, robot.imu);
         robot.drivetrain.reset();
         robot.clearCache();
