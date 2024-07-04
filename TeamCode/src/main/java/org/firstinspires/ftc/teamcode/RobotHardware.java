@@ -2,12 +2,18 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.List;
 
 public class RobotHardware {
@@ -24,6 +30,7 @@ public class RobotHardware {
     List<LynxModule> allHubs;
     BHI260IMU imu;
     IMU.Parameters myIMUparameters;
+    Telemetry telemetry;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotHardware (OpMode opmode) {
@@ -37,6 +44,8 @@ public class RobotHardware {
      * All of the hardware devices are accessed via the hardware map, and initialized.
      */
     public void init()    {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()); // telemetry for ftc dashboard and driver station
+
         imu = myOpMode.hardwareMap.get(BHI260IMU.class, "imu");
         imu.initialize(
                 myIMUparameters = new IMU.Parameters(
