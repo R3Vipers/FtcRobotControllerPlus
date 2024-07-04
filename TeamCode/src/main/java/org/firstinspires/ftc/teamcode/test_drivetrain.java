@@ -73,7 +73,7 @@ public class test_drivetrain extends OpMode {
     public void updateAll() {
         odo.update();//call the odometry to update the current position
         current_pos = odo.getPose();
-        telemetry.addData("change in heading", "%f", robot.motor_odo.deltaHeading);
+        //telemetry.addData("change in heading", "%f", robot.motor_odo.deltaHeading);
         Orientation angles = robot.imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
         double angle = angles.firstAngle;
         telemetry.addData("angle", "%f", angle);
