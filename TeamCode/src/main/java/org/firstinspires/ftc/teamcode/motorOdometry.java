@@ -86,14 +86,8 @@ public class motorOdometry {
         double deltaFwd = ((delta_L_F - turn_ticks)*Math.cos(wheel_theta) + (delta_L_B - turn_ticks)*Math.cos(wheel_theta) +
                 (delta_R_F - turn_ticks)*Math.cos(wheel_theta) + (delta_R_B - turn_ticks)*Math.cos(wheel_theta)) / 4;
 
-        double r0 = deltaFwd/(deltaHeading);
-        double r1 = deltaStr/(deltaHeading);
-
-        double relDeltaX = r0*sin(deltaHeading) - r1*(1-cos(deltaHeading));
-        double relDeltaY = r1*sin(deltaHeading) + r0*(1-cos(deltaHeading));
-
-        x+=relDeltaX*cos(heading) - relDeltaY*sin(heading);
-        y+=relDeltaY*cos(heading) + relDeltaX*sin(heading);
+        x+=deltaFwd*cos(heading) - deltaStr*sin(heading);
+        y+=deltaStr*cos(heading) + deltaFwd*sin(heading);
 
         past_left_front_pos = current_left_front_pos;
         past_left_back_pos = current_left_back_pos;
